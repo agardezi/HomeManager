@@ -4,7 +4,7 @@ import { Text, StyleSheet,View, Image, TouchableWithoutFeedback, Vibration } fro
 
 export default function ModuleBox(props){
     return(
-        <TouchableWithoutFeedback onPress={()=>{props.handlePress()}}>
+        <TouchableWithoutFeedback onPress={()=>{props.handlePress && props.handlePress()}}>
             <Animatable.View
                 animation="bounceIn"
                 delay={props.delay && props.delay} 

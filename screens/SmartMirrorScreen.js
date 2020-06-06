@@ -1,10 +1,14 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { Image, Platform, StyleSheet, Text, View, Button} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import ModuleBox from '../components/ModuleBox'
+import ModuleBox from '../components/ModuleBox';
+import { connect } from 'react-redux';
+import { updateModule } from '../stores/smartMirror/SmartMirrorAction'
 
 
-export default function SmartMirrorScreen(props){
+
+function SmartMirrorScreen(props){
     return(
         <View style={styles.container}> 
         <ScrollView>
@@ -15,25 +19,53 @@ export default function SmartMirrorScreen(props){
             <Text style={styles.caption}>
                 Customize the different modules that apear on your smart mirror
             </Text>
-            <ModuleBox
-                title="Clock"
-                handlePress={()=>props.navigation.push("EditModule",{
-                    name:"Clock"
-                }
-            )}
+            <GetCards 
+                handleClick={props.updateModule} 
+                array={props.modules} 
+                navigation={props.navigation}
             />
-            <ModuleBox
-                title="Current Weather"
-                handlePress={()=>props.navigation.push("EditModule",{
-                    name:"Current Weather"
-                }
-            )}
-            />            
+            
             </View>
             </ScrollView>
         </View>
     )
 }
+function GetCards(props){
+    let cards = [];
+    let mods = props.array;
+    for(let mod in mods){
+        cards.push(
+            <ModuleBox
+                key={mod}
+                title={mods[mod].name}
+                handlePress={()=>props.navigation.push("EditModule",{
+                    name:mods[mod].name,
+                    object:mods[mod].attributes,
+                    handleClick:props.handleClick
+
+                }
+            )}                
+            />
+        )
+    }
+    return cards
+}
+
+SmartMirrorScreen.propTypes = {
+    updateModule: PropTypes.func,
+    config: PropTypes.object,
+    modules: PropTypes.array,
+    isLoading: PropTypes.bool,
+};
+
+const mapStateToProps = state =>({
+    config: state.global.config,
+    modules: state.global.modules,
+    isLoading: state.global.isLoading,
+})
+
+export default connect(mapStateToProps, {updateModule})(SmartMirrorScreen)
+
 
 const styles = StyleSheet.create({
     container: {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Image, Platform, StyleSheet, Text, View, Button, ScrollView, TextInput, Picker} from 'react-native';
+import {StyleSheet, Text, View, Button, ScrollView, TextInput,TouchableWithoutFeedback} from 'react-native';
 
 // Take in module object as props
 // createsbackup object incase user cancels edit without saving
@@ -8,17 +8,111 @@ import { Image, Platform, StyleSheet, Text, View, Button, ScrollView, TextInput,
 
 class EditModuleScreen extends Component {
     constructor(props){
-    super(props);
+        super(props);
+        this.state = {
+            form: this.props.route.params.object,
+            formField: null
+        }
+        this.getFormFields = this.getFormFields.bind(this);
+        this.handleChange = this.handleChange.bind(this);
     }
-    state = {  }
+
+    componentDidMount(){
+        this.getFormFields();
+    }
+    handleChange(index,value){
+        let obj = this.state.form;
+        obj[index].value = value
+        this.setState({
+            form: obj,
+
+        })
+        this.getFormFields();
+        // ;
+    }
+    onSave(){
+        this.props.route.params.handleClick(this.state.form,this.props.route.params.name);
+        this.props.navigation.pop();
+    }
+    onCancel(){
+        // revert changes
+        this.props.navigation.pop(); 
+    }
+
+    getFormFields(){
+        console.log("Running GetFormFields")
+        let fields = [];
+        let index = 0;
+        for(let field in this.state.form){
+            if(this.state.form[field].type == "drop-down"){
+                let options = [];
+                for(let option in this.state.form[field].options){
+                    options.push(
+                    // <Picker.Item 
+                    //     key={option} 
+                    //     id={option}
+                    //     label={this.state.form[field].options[option]} 
+                    //     value={this.state.form[field].options[option]}>
+                    // }</Picker.Item>
+                    <TouchableWithoutFeedback 
+                        onPress={()=>{this.handleChange(field,this.state.form[field].options[option])}}
+                        >
+                        <View 
+                            key={option}  
+                            style={this.state.form[field].options[option] == this.state.form[field].value? styles.selectedTag:styles.tag}
+                            >
+                            <Text style={this.state.form[field].options[option] == this.state.form[field].value?styles.selectedButtonText:styles.buttonText}>{this.state.form[field].options[option]}</Text>
+                        </View>
+                    </TouchableWithoutFeedback>
+                    )
+                }
+                fields.push(
+                    <View key={field} >
+                        <Text style={styles.label}>{this.state.form[field].name}</Text>
+                        <View style={styles.tagContainer}>
+                            {options}
+                        </View>
+                       
+                    </View>
+                )
+            } else{
+                fields.push(
+                    <View key={field}>
+                        <Text style={styles.label}>{this.state.form[field].name}</Text>
+                        <View style={styles.inputBox} >
+                            <TextInput
+                                style={styles.fieldText} 
+                                id={field}
+                                name={this.state.form[field].name}
+                                onChangeText={(value)=>{this.handleChange(field,value)}} 
+                                value={this.state.form[field].value}
+                            />
+                        </View>
+                    </View>
+                )
+            }
+            this.setState({
+                formField:fields
+            })
+        }
+    }
+
     
     render() {
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={styles.headerRow}>
-                        <Button title="Cancel" color="#FF9500" onPress={()=>this.props.navigation.pop()}/>
-                        <Button title="Save"  color="#FF9500"/>
+                        <Button 
+                            title="Cancel" 
+                            color="#FF9500" 
+                            onPress={()=>this.onCancel()}
+                            />
+                        <Button 
+                            title="Save"
+                            color="#FF9500" 
+                            onPress={()=>this.onSave()}  
+                            />
                     </View>
                     <View style={{marginLeft:10, marginBottom: 10}}>
                         <Text style={styles.headerTitle}>{this.props.route.params.name}</Text>
@@ -26,20 +120,9 @@ class EditModuleScreen extends Component {
                 </View>
                 <ScrollView   contentContainerStyle={styles.container}>
                     <View style={styles.formContainer}>
-                        <Text style={styles.label}>Header</Text>
-                        <View style={styles.inputBox}>
-                            <TextInput style={styles.fieldText} editable />
-                        </View>
-
-                        <Text style={styles.label}>Position</Text>
-                        <View style={styles.inputBox}>
-                            <Picker style={styles.fieldText}>
-                            <Picker.Item label="Top Bar" value="Top Bar" />
-                            <Picker.Item label="Bottom Bar" value="Bottom Bar" />
-                            </Picker>   
-                        </View>
+                        {this.state.formField}
                     </View>
-
+                    
                 </ScrollView>           
             </View>
         );
@@ -54,8 +137,6 @@ const styles = StyleSheet.create({
     },
     container:{
          flex:1,
-        
-        
          backgroundColor: '#1C1C1C',
 
     },
@@ -105,5 +186,48 @@ const styles = StyleSheet.create({
         marginBottom:10,
         borderRadius:12,
 
+    },
+    buttonText:{
+        color:"#FFFFFF",
+        fontSize:14,
+        marginBottom:5,
+        marginTop:5,
+        marginLeft:10,
+        marginRight:10,
+
+    },
+    selectedButtonText:{
+        color:"#313134",
+        fontSize:14,
+        marginBottom:5,
+        marginTop:5,
+        marginLeft:10,
+        marginRight:10,
+    },
+    tagContainer:{
+        marginTop:10,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignContent: 'center',
+        flexWrap: 'wrap',
+    },
+    tag:{
+        textAlign:'center',
+        marginRight:10,
+        marginBottom:10,
+        backgroundColor: "#232323",
+        borderColor: "#313134",
+        borderWidth: 1,
+        borderRadius:12,
+        opacity: 50
+    },
+    selectedTag:{
+        marginRight:10,
+        marginBottom:10,
+        backgroundColor: "#FFFFFF",
+        color:"#313134",
+        borderColor: "#FFFFFF",
+        borderWidth: 1,
+        borderRadius:12,
     }
 })

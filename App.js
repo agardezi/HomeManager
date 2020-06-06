@@ -13,6 +13,11 @@ import LinkingConfiguration from './navigation/LinkingConfiguration';
 import HomeScreen from './screens/HomeScreen';
 import SmartMirrorScreen from './screens/SmartMirrorScreen'
 import EditModuleScreen from './screens/EditModuleScreen'
+import { Provider } from 'react-redux'
+import {fetchConfig} from './stores/smartMirror/SmartMirrorAction';
+
+import store from './stores/store'
+
 
 enableScreens();
 const Stack = createNativeStackNavigator();
@@ -68,8 +73,19 @@ function NavigationStack(){
     </Stack.Navigator>
   )
 }
+function Router(){
+  return(
+    <View style={styles.container}>
+    {Platform.OS === 'ios' && <StatusBar barStyle="dark-content" />}
+    <NavigationContainer theme={DarkTheme}>
+      <NavigationStack />
+    </NavigationContainer>
+  </View>
+  )
+}
 
 export default function App(props) {
+  fetchConfig();
   const isLoadingComplete = useCachedResources();
 
 
@@ -77,18 +93,9 @@ export default function App(props) {
     return null;
   } else {
     return (
-      <View style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle="dark-content" />}
-        <NavigationContainer theme={DarkTheme}>
-          <NavigationStack />
-        </NavigationContainer>
-
-        {/* <NavigationContainer linking={LinkingConfiguration}>
-          <Stack.Navigator>
-            <Stack.Screen name="Root" component={BottomTabNavigator} />
-          </Stack.Navigator>
-        </NavigationContainer> */}
-      </View>
+      <Provider store={store}>
+        <Router />
+      </Provider>
     );
   }
 }

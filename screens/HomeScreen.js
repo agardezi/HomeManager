@@ -3,10 +3,23 @@ import * as React from 'react';
 import { Image, Platform, StyleSheet, Text, View, Button} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import DeviceBox from '../components/DeviceBox'
-
 import { MonoText } from '../components/StyledText';
+import { fetchConfig } from '../stores/smartMirror/SmartMirrorAction';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
-export default function HomeScreen(props) {
+
+
+
+
+export class HomeScreen extends React.Component{
+  constructor(props){
+    super(props);
+  }
+  componentDidMount() {
+    this.props.fetchConfig()
+  }
+  render(){
   return (
     <View style={styles.container}>
       <ScrollView  contentContainerStyle={styles.contentContainer}>
@@ -23,7 +36,7 @@ export default function HomeScreen(props) {
           <DeviceBox
               label="Smart Mirror"
               iconPath="../assets/images/mirror_icon.png"
-              handlePress={()=>props.navigation.push("Smart Mirror")}
+              handlePress={()=>this.props.navigation.push("Smart Mirror")}
               delay={3}
             />
           <DeviceBox
@@ -46,11 +59,20 @@ export default function HomeScreen(props) {
     </View>
   );
 }
+}
+HomeScreen.propTypes = {
+  fetchConfig: PropTypes.func.isRequired
+};
+
+const mapStateToProps = state => ({
+  config: state.config
+});
 
 HomeScreen.navigationOptions = {
   header: null,
 };
 
+export default connect(mapStateToProps,{ fetchConfig })(HomeScreen);
 
 const styles = StyleSheet.create({
   container: {
@@ -101,7 +123,5 @@ const styles = StyleSheet.create({
     height:50,
     marginTop:20,
     marginBottom:20,
-
-
   }
 });
