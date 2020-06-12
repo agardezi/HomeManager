@@ -1,6 +1,7 @@
 const headers = { 'Content-Type': 'application/json' }
 
 const baseurl = "192.168.86.39"
+const localurl= "192.168.0.42"
 
 
 export function getConfigFile(){

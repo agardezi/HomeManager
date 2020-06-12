@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import {StyleSheet, Text, View, Button, ScrollView, TextInput,TouchableWithoutFeedback} from 'react-native';
+import * as Animatable from 'react-native-animatable';
+
 
 // Take in module object as props
 // createsbackup object incase user cancels edit without saving
@@ -40,7 +42,6 @@ class EditModuleScreen extends Component {
     }
 
     getFormFields(){
-        console.log("Running GetFormFields")
         let fields = [];
         let index = 0;
         for(let field in this.state.form){
@@ -48,21 +49,18 @@ class EditModuleScreen extends Component {
                 let options = [];
                 for(let option in this.state.form[field].options){
                     options.push(
-                    // <Picker.Item 
-                    //     key={option} 
-                    //     id={option}
-                    //     label={this.state.form[field].options[option]} 
-                    //     value={this.state.form[field].options[option]}>
-                    // }</Picker.Item>
                     <TouchableWithoutFeedback 
                         onPress={()=>{this.handleChange(field,this.state.form[field].options[option])}}
                         >
-                        <View 
+                        <Animatable.View
+                         animation="fadeIn"
+                         delay={""+option+"0"}
+                         easing="linear" 
                             key={option}  
                             style={this.state.form[field].options[option] == this.state.form[field].value? styles.selectedTag:styles.tag}
                             >
                             <Text style={this.state.form[field].options[option] == this.state.form[field].value?styles.selectedButtonText:styles.buttonText}>{this.state.form[field].options[option]}</Text>
-                        </View>
+                        </Animatable.View>
                     </TouchableWithoutFeedback>
                     )
                 }
